@@ -1,28 +1,1048 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth" x-data>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PlaneFYI Embed Widget — Aircraft Widgets for Any Website</title>
-  <meta name="description" content="Embed PlaneFYI aircraft widgets on any website. Zero dependencies, Shadow DOM isolation.">
+  <title>PlaneFYI Embed Widget — Transport FYI Developer Documentation</title>
+  <meta name="description" content="Embed PlaneFYI transport data widgets on your website. Free, zero-dependencies, Shadow DOM isolated. Aviation, railway, and flight data for developers.">
+  <meta property="og:title" content="PlaneFYI Embed Widget — Transport FYI">
+  <meta property="og:description" content="Embed PlaneFYI transport data on your website. Free widgets, zero dependencies, Shadow DOM isolated.">
+  <meta property="og:url" content="https://widget.planefyi.com">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://widget.planefyi.com/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://widget.planefyi.com">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "name": "PlaneFYI Embed Widget",
+        "url": "https://widget.planefyi.com",
+        "description": "Embeddable transport data widgets for planefyi.com. Zero dependencies, Shadow DOM isolated.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "PlaneFYI", "item": "https://planefyi.com" },
+          { "@type": "ListItem", "position": 2, "name": "Embed Widget" }
+        ]
+      },
+      {
+        "@type": "SoftwareSourceCode",
+        "name": "planefyi-embed",
+        "codeRepository": "https://github.com/fyipedia/planefyi-embed",
+        "programmingLanguage": "TypeScript",
+        "license": "https://opensource.org/licenses/MIT"
+      }
+    ]
+  }
+  </script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            accent: {
+              DEFAULT: '#0284C7',
+            }
+          },
+          fontFamily: {
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- JetBrains Mono font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
+
+  <!-- Dark mode FOUC prevention -->
+  <script>
+    (function() {
+      var theme = localStorage.getItem('theme');
+      if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
+
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; color: #1a1a1a; }
-    h1 { color: #0284C7; }
-    pre { background: #f5f5f5; padding: 1rem; border-radius: 8px; overflow-x: auto; }
-    .badge { display: inline-block; background: #0284C7; color: white; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.875rem; text-decoration: none; margin-right: 0.5rem; }
+    [x-cloak] { display: none !important; }
+
+    .code-block-wrapper { position: relative; }
+    .code-block {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 1.6;
+      background: #0f172a;
+      border-radius: 0.5rem;
+      padding: 1.25rem;
+      overflow-x: auto;
+      color: #e2e8f0;
+    }
+    .code-lang-badge {
+      position: absolute;
+      top: 0.5rem;
+      left: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      pointer-events: none;
+    }
+    .code-copy-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      padding: 0.2rem 0.6rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 500;
+      border-radius: 0.25rem;
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .code-copy-btn:hover { background: #334155; color: #e2e8f0; }
+
+    /* Catppuccin Mocha tokens */
+    .hl-tag   { color: #7dd3fc; }
+    .hl-attr  { color: #86efac; }
+    .hl-val   { color: #fde68a; }
+    .hl-str   { color: #fda4af; }
+    .hl-kw    { color: #c4b5fd; }
+    .hl-num   { color: #fdba74; }
+    .hl-fn    { color: #67e8f9; }
+    .hl-punct { color: #94a3b8; }
+    .hl-comment { color: #475569; }
+
+    /* Widget gallery */
+    .ws-btn {
+      padding: 0.375rem 0.875rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      font-family: 'JetBrains Mono', monospace;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s;
+      background: transparent;
+      color: #64748b;
+      border-color: #334155;
+    }
+    .ws-btn.active {
+      background: #0284C7;
+      color: white;
+      border-color: #0284C7;
+    }
+
+    /* Mock widget preview */
+    .mock-widget {
+      background: white;
+      border-radius: 0.75rem;
+      border: 1px solid #e2e8f0;
+      padding: 1.25rem;
+      font-family: system-ui, sans-serif;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      max-width: 360px;
+    }
+    .mock-widget-dark {
+      background: #1a1a1a;
+      border-color: #374151;
+    }
+    .mock-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.25rem 0.625rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: color-mix(in srgb, #0284C7 15%, transparent);
+      color: #0284C7;
+    }
+    .mock-route-line {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0.5rem 0;
+      font-size: 0.85rem;
+    }
+    .mock-route-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #0284C7;
+      flex-shrink: 0;
+    }
+    .mock-route-connector {
+      flex: 1;
+      height: 1px;
+      background: #e2e8f0;
+    }
   </style>
 </head>
-<body>
-  <h1>PlaneFYI Embed Widget</h1>
-  <p>
-    <a class="badge" href="https://www.npmjs.com/package/planefyi-embed">npm</a>
-    <a class="badge" href="https://github.com/fyipedia/planefyi-embed">GitHub</a>
-    <a class="badge" href="https://planefyi.com">Visit PlaneFYI</a>
-  </p>
-  <p>Embed PlaneFYI aircraft widgets on any website. Zero dependencies, Shadow DOM style isolation, 4 themes, 2 styles.</p>
-  <h2>Quick Start</h2>
-  <pre><code>&lt;div data-planefyi="entity" data-slug="aircraft-types" data-theme="light"&gt;&lt;/div&gt;
-&lt;script src="https://cdn.jsdelivr.net/npm/planefyi-embed@1/dist/embed.min.js"&gt;&lt;/script&gt;</code></pre>
-  <script src="https://cdn.jsdelivr.net/npm/planefyi-embed@1/dist/embed.min.js"></script>
+<body class="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+
+  <!-- Sticky header -->
+  <header class="sticky top-0 z-50 bg-white/90 dark:bg-gray-950/90 backdrop-blur border-b border-gray-200 dark:border-gray-800">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <!-- Plane/transport icon -->
+        <svg class="w-7 h-7" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="32" height="32" rx="8" fill="#0284C7"/>
+          <path d="M6 20L14 12L12 8L16 9L18 12L24 10L25 12L20 15L22 22L19 22L16 17L13 19L13 22L10 22L10 18L6 20Z" fill="white"/>
+        </svg>
+        <div>
+          <span class="font-bold text-lg" style="color: #0284C7">PlaneFYI</span>
+          <span class="text-gray-500 dark:text-gray-400 text-sm ml-1">Embed Widget</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="https://planefyi.com" class="text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors">planefyi.com ↗</a>
+        <a href="https://github.com/fyipedia/planefyi-embed"
+           class="hidden sm:inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          GitHub
+        </a>
+        <button onclick="toggleDark()" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" aria-label="Toggle dark mode">
+          <svg class="w-4 h-4 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+          <svg class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero section -->
+  <section class="py-20 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-950 border-b border-gray-200 dark:border-gray-800">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-medium mb-6 border"
+               style="background: color-mix(in srgb, #0284C7 10%, transparent); color: #0284C7; border-color: color-mix(in srgb, #0284C7 30%, transparent)">
+            <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
+            Free · Zero Dependencies · Shadow DOM
+          </div>
+          <h1 class="text-4xl font-bold tracking-tight text-gray-900 dark:text-white mb-4">
+            Embed <span style="color: #0284C7">PlaneFYI</span><br>on Any Website
+          </h1>
+          <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">
+            Add PlaneFYI transport data widgets to your blog, app, or documentation with a single script tag. Shadow DOM isolation ensures zero CSS conflicts.
+          </p>
+          <div class="flex flex-wrap gap-3">
+            <a href="#quick-start"
+               class="px-5 py-2.5 rounded-lg text-sm font-semibold text-white transition-opacity hover:opacity-90"
+               style="background: #0284C7">
+              Get Started →
+            </a>
+            <a href="https://github.com/fyipedia/planefyi-embed"
+               class="px-5 py-2.5 rounded-lg text-sm font-semibold border border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
+              npm install planefyi-embed
+            </a>
+            <a href="https://planefyi.com"
+               class="px-5 py-2.5 rounded-lg text-sm font-semibold border border-gray-200 dark:border-gray-700 hover:border-gray-400 transition-colors">
+              Visit planefyi.com ↗
+            </a>
+          </div>
+        </div>
+
+        <!-- Mock widget preview -->
+        <div class="flex justify-center lg:justify-end">
+          <div class="mock-widget">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <p class="text-xs text-gray-500 uppercase tracking-wide font-medium mb-0.5">Aircraft</p>
+                <h3 class="font-bold text-lg text-gray-900">aircraft-types</h3>
+              </div>
+              <span class="mock-badge">Transport</span>
+            </div>
+            <div class="mock-route-line">
+              <div class="mock-route-dot"></div>
+              <div class="flex-1 mx-1" style="height:2px; background: linear-gradient(to right, #0284C7, color-mix(in srgb, #0284C7 40%, #e2e8f0))"></div>
+              <div class="mock-route-dot"></div>
+            </div>
+            <div class="grid grid-cols-3 gap-2 mt-3">
+              <div class="bg-gray-50 rounded-lg p-2 text-center">
+                <p class="text-xs text-gray-500">Routes</p>
+                <p class="text-sm font-bold text-gray-900">142</p>
+              </div>
+              <div class="bg-gray-50 rounded-lg p-2 text-center">
+                <p class="text-xs text-gray-500">Alliance</p>
+                <p class="text-sm font-bold" style="color:#0284C7">Star</p>
+              </div>
+              <div class="bg-gray-50 rounded-lg p-2 text-center">
+                <p class="text-xs text-gray-500">Fleet</p>
+                <p class="text-sm font-bold text-gray-900">287</p>
+              </div>
+            </div>
+            <div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
+              <span class="text-xs text-gray-400">Powered by</span>
+              <a href="https://planefyi.com" class="text-xs font-semibold" style="color:#0284C7">planefyi.com ↗</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Start -->
+  <section id="quick-start" class="py-16 border-b border-gray-200 dark:border-gray-800">
+    <div class="max-w-6xl mx-auto px-4">
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Quick Start</h2>
+      <p class="text-gray-500 dark:text-gray-400 mb-8">Add the script tag and use the custom element — it just works.</p>
+
+      <div class="grid lg:grid-cols-2 gap-6">
+        <div>
+          <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 font-mono">① Add the script</p>
+          <div class="code-block-wrapper">
+            <span class="code-lang-badge">HTML</span>
+            <button class="code-copy-btn" onclick="copyCode('qs-script')">Copy</button>
+            <pre class="code-block pt-7"><code><span class="hl-tag">&lt;script</span> <span class="hl-attr">src</span><span class="hl-punct">=</span><span class="hl-val">"https://cdn.jsdelivr.net/npm/planefyi-embed@1/dist/embed.min.js"</span><span class="hl-tag">&gt;&lt;/script&gt;</span></code></pre>
+          </div>
+          <script type="text/plain" id="qs-script"><script src="https://cdn.jsdelivr.net/npm/planefyi-embed@1/dist/embed.min.js"></script></script>
+        </div>
+
+        <div>
+          <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 font-mono">② Use the element</p>
+          <div class="code-block-wrapper">
+            <span class="code-lang-badge">HTML</span>
+            <button class="code-copy-btn" onclick="copyCode('qs-element')">Copy</button>
+            <pre class="code-block pt-7"><code><span class="hl-tag">&lt;data-planefyi-entity</span>
+  <span class="hl-attr">slug</span><span class="hl-punct">=</span><span class="hl-val">"aircraft-types"</span>
+  <span class="hl-attr">theme</span><span class="hl-punct">=</span><span class="hl-val">"auto"</span>
+  <span class="hl-attr">style-variant</span><span class="hl-punct">=</span><span class="hl-val">"technical"</span>
+<span class="hl-tag">&gt;&lt;/data-planefyi-entity&gt;</span></code></pre>
+          </div>
+          <script type="text/plain" id="qs-element"><data-planefyi-entity slug="aircraft-types" theme="auto" style-variant="technical"></data-planefyi-entity></script>
+        </div>
+      </div>
+
+      <div class="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800">
+        <p class="text-sm text-blue-800 dark:text-blue-300">
+          <strong>That's it.</strong> The widget loads data from the PlaneFYI API, renders in Shadow DOM, and adapts to the page's color scheme automatically.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Widget Gallery -->
+  <section id="gallery" class="py-16 border-b border-gray-200 dark:border-gray-800">
+    <div class="max-w-6xl mx-auto px-4">
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Widget Gallery</h2>
+      <p class="text-gray-500 dark:text-gray-400 mb-8">All widget types, both styles, light and dark themes.</p>
+
+      <!-- Widget type selector -->
+      <div x-data="{ activeWidget: 'entity' }" class="space-y-8">
+        <div class="flex flex-wrap gap-2">
+          <button @click="activeWidget = 'entity'" :class="activeWidget === 'entity' ? 'active' : ''" class="ws-btn">Entity Card</button>
+          <button @click="activeWidget = 'glossary'" :class="activeWidget === 'glossary' ? 'active' : ''" class="ws-btn">Glossary</button>
+          <button @click="activeWidget = 'faq'" :class="activeWidget === 'faq' ? 'active' : ''" class="ws-btn">FAQ</button>
+          <button @click="activeWidget = 'search'" :class="activeWidget === 'search' ? 'active' : ''" class="ws-btn">Search</button>
+          <button @click="activeWidget = 'compare'" :class="activeWidget === 'compare' ? 'active' : ''" class="ws-btn">Compare</button>
+          <button @click="activeWidget = 'guide'" :class="activeWidget === 'guide' ? 'active' : ''" class="ws-btn">Guide</button>
+          <button @click="activeWidget = 'inline'" :class="activeWidget === 'inline' ? 'active' : ''" class="ws-btn">Inline Badges</button>
+        </div>
+
+        <!-- Entity Card -->
+        <div x-show="activeWidget === 'entity'" class="grid lg:grid-cols-2 gap-6">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 font-mono">technical</span>
+              <span class="text-xs px-2 py-0.5 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400">Light</span>
+            </div>
+            <div class="code-block-wrapper">
+              <span class="code-lang-badge">HTML</span>
+              <button class="code-copy-btn" onclick="copyCode('entity-tech')">Copy</button>
+              <pre class="code-block pt-7"><code><span class="hl-tag">&lt;data-planefyi-entity</span>
+  <span class="hl-attr">slug</span><span class="hl-punct">=</span><span class="hl-val">"aircraft-types"</span>
+  <span class="hl-attr">theme</span><span class="hl-punct">=</span><span class="hl-val">"light"</span>
+  <span class="hl-attr">style-variant</span><span class="hl-punct">=</span><span class="hl-val">"technical"</span>
+<span class="hl-tag">&gt;&lt;/data-planefyi-entity&gt;</span></code></pre>
+            </div>
+            <script type="text/plain" id="entity-tech"><data-planefyi-entity slug="aircraft-types" theme="light" style-variant="technical"></data-planefyi-entity></script>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 font-mono">modern</span>
+              <span class="text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-300">Dark</span>
+            </div>
+            <div class="code-block-wrapper">
+              <span class="code-lang-badge">HTML</span>
+              <button class="code-copy-btn" onclick="copyCode('entity-modern')">Copy</button>
+              <pre class="code-block pt-7"><code><span class="hl-tag">&lt;data-planefyi-entity</span>
+  <span class="hl-attr">slug</span><span class="hl-punct">=</span><span class="hl-val">"aircraft-types"</span>
+  <span class="hl-attr">theme</span><span class="hl-punct">=</span><span class="hl-val">"dark"</span>
+  <span class="hl-attr">style-variant</span><span class="hl-punct">=</span><span class="hl-val">"modern"</span>
+<span class="hl-tag">&gt;&lt;/data-planefyi-entity&gt;</span></code></pre>
+            </div>
+            <script type="text/plain" id="entity-modern"><data-planefyi-entity slug="aircraft-types" theme="dark" style-variant="modern"></data-planefyi-entity></script>
+          </div>
+        </div>
+
+        <!-- Glossary -->
+        <div x-show="activeWidget === 'glossary'" class="grid lg:grid-cols-2 gap-6">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 font-mono">technical · light</span>
+            </div>
+            <div class="code-block-wrapper">
+              <span class="code-lang-badge">HTML</span>
+              <button class="code-copy-btn" onclick="copyCode('glossary-light')">Copy</button>
+              <pre class="code-block pt-7"><code><span class="hl-tag">&lt;data-planefyi-glossary</span>
+  <span class="hl-attr">slug</span><span class="hl-punct">=</span><span class="hl-val">"iata-code"</span>
+  <span class="hl-attr">theme</span><span class="hl-punct">=</span><span class="hl-val">"light"</span>
+  <span class="hl-attr">style-variant</span><span class="hl-punct">=</span><span class="hl-val">"technical"</span>
+<span class="hl-tag">&gt;&lt;/data-planefyi-glossary&gt;</span></code></pre>
+            </div>
+            <script type="text/plain" id="glossary-light"><data-planefyi-glossary slug="iata-code" theme="light" style-variant="technical"></data-planefyi-glossary></script>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 font-mono">modern · dark</span>
+            </div>
+            <div class="code-block-wrapper">
+              <span class="code-lang-badge">HTML</span>
+              <button class="code-copy-btn" onclick="copyCode('glossary-dark')">Copy</button>
+              <pre class="code-block pt-7"><code><span class="hl-tag">&lt;data-planefyi-glossary</span>
+  <span class="hl-attr">slug</span><span class="hl-punct">=</span><span class="hl-val">"iata-code"</span>
+  <span class="hl-attr">theme</span><span class="hl-punct">=</span><span class="hl-val">"dark"</span>
+  <span class="hl-attr">style-variant</span><span class="hl-punct">=</span><span class="hl-val">"modern"</span>
+<span class="hl-tag">&gt;&lt;/data-planefyi-glossary&gt;</span></code></pre>
+            </div>
+            <script type="text/plain" id="glossary-dark"><data-planefyi-glossary slug="iata-code" theme="dark" style-variant="modern"></data-planefyi-glossary></script>
+          </div>
+        </div>
+
+        <!-- FAQ -->
+        <div x-show="activeWidget === 'faq'" class="grid lg:grid-cols-2 gap-6">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 font-mono">technical · light</span>
+            </div>
+            <div class="code-block-wrapper">
+              <span class="code-lang-badge">HTML</span>
+              <button class="code-copy-btn" onclick="copyCode('faq-light')">Copy</button>
+              <pre class="code-block pt-7"><code><span class="hl-tag">&lt;data-planefyi-faq</span>
+  <span class="hl-attr">slug</span><span class="hl-punct">=</span><span class="hl-val">"aircraft-types"</span>
+  <span class="hl-attr">theme</span><span class="hl-punct">=</span><span class="hl-val">"light"</span>
+  <span class="hl-attr">limit</span><span class="hl-punct">=</span><span class="hl-val">"5"</span>
+<span class="hl-tag">&gt;&lt;/data-planefyi-faq&gt;</span></code></pre>
+            </div>
+            <script type="text/plain" id="faq-light"><data-planefyi-faq slug="aircraft-types" theme="light" limit="5"></data-planefyi-faq></script>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 font-mono">modern · dark · FAQPage JSON-LD</span>
+            </div>
+            <div class="code-block-wrapper">
+              <span class="code-lang-badge">HTML</span>
+              <button class="code-copy-btn" onclick="copyCode('faq-dark')">Copy</button>
+              <pre class="code-block pt-7"><code><span class="hl-tag">&lt;data-planefyi-faq</span>
+  <span class="hl-attr">slug</span><span class="hl-punct">=</span><span class="hl-val">"aircraft-types"</span>
+  <span class="hl-attr">theme</span><span class="hl-punct">=</span><span class="hl-val">"dark"</span>
+  <span class="hl-attr">style-variant</span><span class="hl-punct">=</span><span class="hl-val">"modern"</span>
+  <span class="hl-attr">rich-snippet</span><span class="hl-punct">=</span><span class="hl-val">"true"</span>
+<span class="hl-tag">&gt;&lt;/data-planefyi-faq&gt;</span></code></pre>
+            </div>
+            <script type="text/plain" id="faq-dark"><data-planefyi-faq slug="aircraft-types" theme="dark" style-variant="modern" rich-snippet="true"></data-planefyi-faq></script>
+          </div>
+        </div>
+
+        <!-- Search -->
+        <div x-show="activeWidget === 'search'" class="grid lg:grid-cols-2 gap-6">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 font-mono">technical · light</span>
+            </div>
+            <div class="code-block-wrapper">
+              <span class="code-lang-badge">HTML</span>
+              <button class="code-copy-btn" onclick="copyCode('search-light')">Copy</button>
+              <pre class="code-block pt-7"><code><span class="hl-tag">&lt;data-planefyi-search</span>
+  <span class="hl-attr">theme</span><span class="hl-punct">=</span><span class="hl-val">"light"</span>
+  <span class="hl-attr">placeholder</span><span class="hl-punct">=</span><span class="hl-val">"Search PlaneFYI..."</span>
+  <span class="hl-attr">limit</span><span class="hl-punct">=</span><span class="hl-val">"5"</span>
+<span class="hl-tag">&gt;&lt;/data-planefyi-search&gt;</span></code></pre>
+            </div>
+            <script type="text/plain" id="search-light"><data-planefyi-search theme="light" placeholder="Search PlaneFYI..." limit="5"></data-planefyi-search></script>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 font-mono">modern · dark</span>
+            </div>
+            <div class="code-block-wrapper">
+              <span class="code-lang-badge">HTML</span>
+              <button class="code-copy-btn" onclick="copyCode('search-dark')">Copy</button>
+              <pre class="code-block pt-7"><code><span class="hl-tag">&lt;data-planefyi-search</span>
+  <span class="hl-attr">theme</span><span class="hl-punct">=</span><span class="hl-val">"dark"</span>
+  <span class="hl-attr">style-variant</span><span class="hl-punct">=</span><span class="hl-val">"modern"</span>
+  <span class="hl-attr">limit</span><span class="hl-punct">=</span><span class="hl-val">"8"</span>
+<span class="hl-tag">&gt;&lt;/data-planefyi-search&gt;</span></code></pre>
+            </div>
+            <script type="text/plain" id="search-dark"><data-planefyi-search theme="dark" style-variant="modern" limit="8"></data-planefyi-search></script>
+          </div>
+        </div>
+
+        <!-- Compare -->
+        <div x-show="activeWidget === 'compare'" class="grid lg:grid-cols-2 gap-6">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 font-mono">technical · light</span>
+            </div>
+            <div class="code-block-wrapper">
+              <span class="code-lang-badge">HTML</span>
+              <button class="code-copy-btn" onclick="copyCode('compare-light')">Copy</button>
+              <pre class="code-block pt-7"><code><span class="hl-tag">&lt;data-planefyi-compare</span>
+  <span class="hl-attr">slug-a</span><span class="hl-punct">=</span><span class="hl-val">"aircraft-types"</span>
+  <span class="hl-attr">slug-b</span><span class="hl-punct">=</span><span class="hl-val">"example-b"</span>
+  <span class="hl-attr">theme</span><span class="hl-punct">=</span><span class="hl-val">"light"</span>
+<span class="hl-tag">&gt;&lt;/data-planefyi-compare&gt;</span></code></pre>
+            </div>
+            <script type="text/plain" id="compare-light"><data-planefyi-compare slug-a="aircraft-types" slug-b="example-b" theme="light"></data-planefyi-compare></script>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 font-mono">modern · dark</span>
+            </div>
+            <div class="code-block-wrapper">
+              <span class="code-lang-badge">HTML</span>
+              <button class="code-copy-btn" onclick="copyCode('compare-dark')">Copy</button>
+              <pre class="code-block pt-7"><code><span class="hl-tag">&lt;data-planefyi-compare</span>
+  <span class="hl-attr">slug-a</span><span class="hl-punct">=</span><span class="hl-val">"aircraft-types"</span>
+  <span class="hl-attr">slug-b</span><span class="hl-punct">=</span><span class="hl-val">"example-b"</span>
+  <span class="hl-attr">theme</span><span class="hl-punct">=</span><span class="hl-val">"dark"</span>
+  <span class="hl-attr">style-variant</span><span class="hl-punct">=</span><span class="hl-val">"modern"</span>
+<span class="hl-tag">&gt;&lt;/data-planefyi-compare&gt;</span></code></pre>
+            </div>
+            <script type="text/plain" id="compare-dark"><data-planefyi-compare slug-a="aircraft-types" slug-b="example-b" theme="dark" style-variant="modern"></data-planefyi-compare></script>
+          </div>
+        </div>
+
+        <!-- Guide (AirlineFYI only) -->
+        <div x-show="activeWidget === 'guide'" class="grid lg:grid-cols-2 gap-6">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 font-mono">technical · light</span>
+            </div>
+            <div class="code-block-wrapper">
+              <span class="code-lang-badge">HTML</span>
+              <button class="code-copy-btn" onclick="copyCode('guide-light')">Copy</button>
+              <pre class="code-block pt-7"><code><span class="hl-tag">&lt;data-planefyi-guide</span>
+  <span class="hl-attr">slug</span><span class="hl-punct">=</span><span class="hl-val">"airline-alliances"</span>
+  <span class="hl-attr">theme</span><span class="hl-punct">=</span><span class="hl-val">"light"</span>
+<span class="hl-tag">&gt;&lt;/data-planefyi-guide&gt;</span></code></pre>
+            </div>
+            <script type="text/plain" id="guide-light"><data-planefyi-guide slug="airline-alliances" theme="light"></data-planefyi-guide></script>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 font-mono">modern · dark</span>
+            </div>
+            <div class="code-block-wrapper">
+              <span class="code-lang-badge">HTML</span>
+              <button class="code-copy-btn" onclick="copyCode('guide-dark')">Copy</button>
+              <pre class="code-block pt-7"><code><span class="hl-tag">&lt;data-planefyi-guide</span>
+  <span class="hl-attr">slug</span><span class="hl-punct">=</span><span class="hl-val">"airline-alliances"</span>
+  <span class="hl-attr">theme</span><span class="hl-punct">=</span><span class="hl-val">"dark"</span>
+  <span class="hl-attr">style-variant</span><span class="hl-punct">=</span><span class="hl-val">"modern"</span>
+<span class="hl-tag">&gt;&lt;/data-planefyi-guide&gt;</span></code></pre>
+            </div>
+            <script type="text/plain" id="guide-dark"><data-planefyi-guide slug="airline-alliances" theme="dark" style-variant="modern"></data-planefyi-guide></script>
+          </div>
+        </div>
+
+        <!-- Inline Badges -->
+        <div x-show="activeWidget === 'inline'" class="space-y-6">
+          <p class="text-sm text-gray-500 dark:text-gray-400">Inline badges render as compact spans — perfect for embedding within prose or tables.</p>
+          <div class="grid sm:grid-cols-2 gap-6">
+
+            <!-- AirportFYI type-badge -->
+            <div>
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 font-mono">AirportFYI — type-badge</p>
+              <div class="code-block-wrapper">
+                <span class="code-lang-badge">HTML</span>
+                <button class="code-copy-btn" onclick="copyCode('badge-airport')">Copy</button>
+                <pre class="code-block pt-7"><code><span class="hl-tag">&lt;airportfyi-type-badge</span>
+  <span class="hl-attr">slug</span><span class="hl-punct">=</span><span class="hl-val">"JFK"</span>
+  <span class="hl-attr">theme</span><span class="hl-punct">=</span><span class="hl-val">"auto"</span>
+<span class="hl-tag">&gt;&lt;/airportfyi-type-badge&gt;</span></code></pre>
+              </div>
+              <script type="text/plain" id="badge-airport"><airportfyi-type-badge slug="JFK" theme="auto"></airportfyi-type-badge></script>
+              <div class="mt-3 flex items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
+                      style="background: color-mix(in srgb, #D97706 15%, transparent); color: #D97706">
+                  ✈ International Hub
+                </span>
+                <span class="text-xs text-gray-400">JFK preview</span>
+              </div>
+            </div>
+
+            <!-- AirlineFYI route-badge -->
+            <div>
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 font-mono">AirlineFYI — route-badge</p>
+              <div class="code-block-wrapper">
+                <span class="code-lang-badge">HTML</span>
+                <button class="code-copy-btn" onclick="copyCode('badge-airline')">Copy</button>
+                <pre class="code-block pt-7"><code><span class="hl-tag">&lt;airlinefyi-route-badge</span>
+  <span class="hl-attr">slug</span><span class="hl-punct">=</span><span class="hl-val">"united-airlines"</span>
+  <span class="hl-attr">theme</span><span class="hl-punct">=</span><span class="hl-val">"auto"</span>
+<span class="hl-tag">&gt;&lt;/airlinefyi-route-badge&gt;</span></code></pre>
+              </div>
+              <script type="text/plain" id="badge-airline"><airlinefyi-route-badge slug="united-airlines" theme="auto"></airlinefyi-route-badge></script>
+              <div class="mt-3 flex items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
+                      style="background: color-mix(in srgb, #3B82F6 15%, transparent); color: #3B82F6">
+                  ✈ 142 routes
+                </span>
+                <span class="text-xs text-gray-400">United preview</span>
+              </div>
+            </div>
+
+            <!-- PlaneFYI seats-badge -->
+            <div>
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 font-mono">PlaneFYI — seats-badge</p>
+              <div class="code-block-wrapper">
+                <span class="code-lang-badge">HTML</span>
+                <button class="code-copy-btn" onclick="copyCode('badge-plane')">Copy</button>
+                <pre class="code-block pt-7"><code><span class="hl-tag">&lt;planefyi-seats-badge</span>
+  <span class="hl-attr">slug</span><span class="hl-punct">=</span><span class="hl-val">"boeing-737-800"</span>
+  <span class="hl-attr">theme</span><span class="hl-punct">=</span><span class="hl-val">"auto"</span>
+<span class="hl-tag">&gt;&lt;/planefyi-seats-badge&gt;</span></code></pre>
+              </div>
+              <script type="text/plain" id="badge-plane"><planefyi-seats-badge slug="boeing-737-800" theme="auto"></planefyi-seats-badge></script>
+              <div class="mt-3 flex items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
+                      style="background: color-mix(in srgb, #0284C7 15%, transparent); color: #0284C7">
+                  ✈ 162 seats
+                </span>
+                <span class="text-xs text-gray-400">737-800 preview</span>
+              </div>
+            </div>
+
+            <!-- TrainFYI type-badge + amenities -->
+            <div>
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 font-mono">TrainFYI — type-badge + amenities</p>
+              <div class="code-block-wrapper">
+                <span class="code-lang-badge">HTML</span>
+                <button class="code-copy-btn" onclick="copyCode('badge-train')">Copy</button>
+                <pre class="code-block pt-7"><code><span class="hl-tag">&lt;trainfyi-type-badge</span>
+  <span class="hl-attr">slug</span><span class="hl-punct">=</span><span class="hl-val">"shinkansen"</span>
+  <span class="hl-attr">theme</span><span class="hl-punct">=</span><span class="hl-val">"auto"</span>
+<span class="hl-tag">&gt;&lt;/trainfyi-type-badge&gt;</span>
+<span class="hl-tag">&lt;trainfyi-amenities</span>
+  <span class="hl-attr">slug</span><span class="hl-punct">=</span><span class="hl-val">"shinkansen"</span>
+<span class="hl-tag">&gt;&lt;/trainfyi-amenities&gt;</span></code></pre>
+              </div>
+              <script type="text/plain" id="badge-train"><trainfyi-type-badge slug="shinkansen" theme="auto"></trainfyi-type-badge>
+<trainfyi-amenities slug="shinkansen"></trainfyi-amenities></script>
+              <div class="mt-3 flex items-center gap-2 flex-wrap">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
+                      style="background: color-mix(in srgb, #EA580C 15%, transparent); color: #EA580C">
+                  🚄 High Speed Rail
+                </span>
+                <span class="text-xs text-gray-400">Shinkansen preview</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Widget Options -->
+  <section id="options" class="py-16 border-b border-gray-200 dark:border-gray-800">
+    <div class="max-w-6xl mx-auto px-4">
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Widget Options</h2>
+      <p class="text-gray-500 dark:text-gray-400 mb-8">All widgets share these <code class="font-mono text-sm px-1 py-0.5 bg-gray-100 dark:bg-gray-800 rounded">data-*</code> attributes.</p>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-200 dark:border-gray-700">
+              <th class="text-left py-3 pr-6 font-semibold text-gray-700 dark:text-gray-300 font-mono">Attribute</th>
+              <th class="text-left py-3 pr-6 font-semibold text-gray-700 dark:text-gray-300">Type</th>
+              <th class="text-left py-3 pr-6 font-semibold text-gray-700 dark:text-gray-300">Default</th>
+              <th class="text-left py-3 font-semibold text-gray-700 dark:text-gray-300">Description</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+            <tr>
+              <td class="py-3 pr-6 font-mono text-blue-600 dark:text-blue-400">slug</td>
+              <td class="py-3 pr-6 text-gray-600 dark:text-gray-400">string</td>
+              <td class="py-3 pr-6 font-mono text-gray-500">required</td>
+              <td class="py-3 text-gray-600 dark:text-gray-400">Entity identifier (e.g. <code class="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">JFK</code>, <code class="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">united-airlines</code>)</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-6 font-mono text-blue-600 dark:text-blue-400">theme</td>
+              <td class="py-3 pr-6 text-gray-600 dark:text-gray-400">string</td>
+              <td class="py-3 pr-6 font-mono text-gray-500">"auto"</td>
+              <td class="py-3 text-gray-600 dark:text-gray-400">Color theme: <code class="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">light</code> · <code class="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">dark</code> · <code class="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">sepia</code> · <code class="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">auto</code></td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-6 font-mono text-blue-600 dark:text-blue-400">style-variant</td>
+              <td class="py-3 pr-6 text-gray-600 dark:text-gray-400">string</td>
+              <td class="py-3 pr-6 font-mono text-gray-500">"technical"</td>
+              <td class="py-3 text-gray-600 dark:text-gray-400">Visual style: <code class="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">technical</code> · <code class="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">modern</code></td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-6 font-mono text-blue-600 dark:text-blue-400">size</td>
+              <td class="py-3 pr-6 text-gray-600 dark:text-gray-400">string</td>
+              <td class="py-3 pr-6 font-mono text-gray-500">"default"</td>
+              <td class="py-3 text-gray-600 dark:text-gray-400">Widget size: <code class="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">compact</code> (280px) · <code class="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">default</code> (420px) · <code class="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">large</code> (720px)</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-6 font-mono text-blue-600 dark:text-blue-400">lang</td>
+              <td class="py-3 pr-6 text-gray-600 dark:text-gray-400">string</td>
+              <td class="py-3 pr-6 font-mono text-gray-500">"en"</td>
+              <td class="py-3 text-gray-600 dark:text-gray-400">Display language (ISO 639-1, e.g. <code class="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">ja</code>, <code class="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">es</code>)</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-6 font-mono text-blue-600 dark:text-blue-400">limit</td>
+              <td class="py-3 pr-6 text-gray-600 dark:text-gray-400">number</td>
+              <td class="py-3 pr-6 font-mono text-gray-500">5</td>
+              <td class="py-3 text-gray-600 dark:text-gray-400">Max results for list/search widgets</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-6 font-mono text-blue-600 dark:text-blue-400">rich-snippet</td>
+              <td class="py-3 pr-6 text-gray-600 dark:text-gray-400">boolean</td>
+              <td class="py-3 pr-6 font-mono text-gray-500">false</td>
+              <td class="py-3 text-gray-600 dark:text-gray-400">Inject FAQPage JSON-LD into host page (FAQ widgets only)</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-6 font-mono text-blue-600 dark:text-blue-400">no-powered-by</td>
+              <td class="py-3 pr-6 text-gray-600 dark:text-gray-400">boolean</td>
+              <td class="py-3 pr-6 font-mono text-gray-500">false</td>
+              <td class="py-3 text-gray-600 dark:text-gray-400">Hide the "Powered by planefyi.com" backlink</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Styles & Themes -->
+  <section id="themes" class="py-16 border-b border-gray-200 dark:border-gray-800">
+    <div class="max-w-6xl mx-auto px-4">
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Styles &amp; Themes</h2>
+      <p class="text-gray-500 dark:text-gray-400 mb-8">2 visual styles × 4 color themes = 8 combinations.</p>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <!-- light -->
+        <div class="rounded-xl border-2 p-4" style="border-color: #0284C7">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-3 h-3 rounded-full bg-white border border-gray-300"></div>
+            <span class="font-mono font-semibold text-sm">light</span>
+          </div>
+          <p class="text-xs text-gray-500">Clean white background. Ideal for light-themed sites.</p>
+        </div>
+        <!-- dark -->
+        <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-4 bg-gray-900">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-3 h-3 rounded-full bg-gray-800 border border-gray-600"></div>
+            <span class="font-mono font-semibold text-sm text-gray-100">dark</span>
+          </div>
+          <p class="text-xs text-gray-400">Deep dark background. Matches dark-mode layouts.</p>
+        </div>
+        <!-- sepia -->
+        <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-4" style="background: #f5f0e8">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-3 h-3 rounded-full" style="background: #c9a96e"></div>
+            <span class="font-mono font-semibold text-sm" style="color: #3d3529">sepia</span>
+          </div>
+          <p class="text-xs" style="color: #6b5a47">Warm amber tone. Great for editorial content.</p>
+        </div>
+        <!-- auto -->
+        <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-4" style="background: linear-gradient(135deg, white 50%, #1a1a1a 50%)">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-3 h-3 rounded-full" style="background: linear-gradient(135deg, #e2e8f0 50%, #374151 50%)"></div>
+            <span class="font-mono font-semibold text-sm" style="text-shadow: 0 0 4px rgba(255,255,255,0.7)">auto</span>
+          </div>
+          <p class="text-xs text-gray-600">Follows OS <code class="font-mono">prefers-color-scheme</code> with live updates.</p>
+        </div>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div class="p-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+          <h3 class="font-semibold font-mono mb-1" style="color: #0284C7">technical</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Structured data layout with clear hierarchy, specification tables, and monospace labels. Designed for aviation and railway technical data.</p>
+        </div>
+        <div class="p-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+          <h3 class="font-semibold font-mono mb-1" style="color: #0284C7">modern</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Clean card-based layout with rounded corners and subtle shadows. Works well in content sites, travel blogs, and general-purpose embeds.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CDN Options -->
+  <section id="cdn" class="py-16 border-b border-gray-200 dark:border-gray-800">
+    <div class="max-w-6xl mx-auto px-4">
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">CDN Options</h2>
+      <p class="text-gray-500 dark:text-gray-400 mb-8">Three ways to load the widget bundle.</p>
+
+      <div class="grid md:grid-cols-3 gap-6">
+
+        <!-- jsDelivr (Recommended) -->
+        <div class="p-5 rounded-xl border-2 border-gray-200 dark:border-gray-700 relative" style="border-color: #0284C7">
+          <div class="absolute -top-3 left-4">
+            <span class="px-2 py-0.5 text-xs font-bold rounded-full text-white" style="background: #0284C7">Recommended</span>
+          </div>
+          <h3 class="font-semibold text-gray-900 dark:text-white mb-1 mt-1">jsDelivr</h3>
+          <p class="text-xs text-gray-500 mb-4">Global CDN, automatic versioning, 99.9% uptime SLA.</p>
+          <div class="code-block-wrapper">
+            <span class="code-lang-badge">HTML</span>
+            <button class="code-copy-btn" onclick="copyCode('cdn-jsdelivr')">Copy</button>
+            <pre class="code-block pt-7" style="font-size:0.7rem"><code><span class="hl-tag">&lt;script</span> <span class="hl-attr">src</span><span class="hl-punct">=</span><span class="hl-val">"https://cdn.jsdelivr.net/npm/planefyi-embed@1/dist/embed.min.js"</span><span class="hl-tag">&gt;&lt;/script&gt;</span></code></pre>
+          </div>
+          <script type="text/plain" id="cdn-jsdelivr"><script src="https://cdn.jsdelivr.net/npm/planefyi-embed@1/dist/embed.min.js"></script></script>
+        </div>
+
+        <!-- npm -->
+        <div class="p-5 rounded-xl border border-gray-200 dark:border-gray-700">
+          <h3 class="font-semibold text-gray-900 dark:text-white mb-1">npm + bundler</h3>
+          <p class="text-xs text-gray-500 mb-4">Import in your JS bundle (Vite, Webpack, Rollup).</p>
+          <div class="code-block-wrapper mb-3">
+            <span class="code-lang-badge">SHELL</span>
+            <button class="code-copy-btn" onclick="copyCode('cdn-npm-install')">Copy</button>
+            <pre class="code-block pt-7" style="font-size:0.7rem"><code><span class="hl-fn">npm</span> install planefyi-embed</code></pre>
+          </div>
+          <script type="text/plain" id="cdn-npm-install">npm install planefyi-embed</script>
+          <div class="code-block-wrapper">
+            <span class="code-lang-badge">JS</span>
+            <button class="code-copy-btn" onclick="copyCode('cdn-npm-import')">Copy</button>
+            <pre class="code-block pt-7" style="font-size:0.7rem"><code><span class="hl-kw">import</span> <span class="hl-str">"planefyi-embed"</span><span class="hl-punct">;</span></code></pre>
+          </div>
+          <script type="text/plain" id="cdn-npm-import">import "planefyi-embed";</script>
+        </div>
+
+        <!-- Self-hosted -->
+        <div class="p-5 rounded-xl border border-gray-200 dark:border-gray-700">
+          <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Self-hosted (R2)</h3>
+          <p class="text-xs text-gray-500 mb-4">Download and host on your own CDN or R2 bucket.</p>
+          <div class="code-block-wrapper">
+            <span class="code-lang-badge">HTML</span>
+            <button class="code-copy-btn" onclick="copyCode('cdn-self')">Copy</button>
+            <pre class="code-block pt-7" style="font-size:0.7rem"><code><span class="hl-tag">&lt;script</span> <span class="hl-attr">src</span><span class="hl-punct">=</span><span class="hl-val">"/assets/planefyi-embed.min.js"</span><span class="hl-tag">&gt;&lt;/script&gt;</span></code></pre>
+          </div>
+          <script type="text/plain" id="cdn-self"><script src="/assets/planefyi-embed.min.js"></script></script>
+          <p class="text-xs text-gray-400 mt-3">Download from <a href="https://github.com/fyipedia/planefyi-embed/releases" class="underline">GitHub Releases</a>.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Transport FYI Family -->
+  <section id="family" class="py-16 border-b border-gray-200 dark:border-gray-800">
+    <div class="max-w-6xl mx-auto px-4">
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Transport FYI Family</h2>
+      <p class="text-gray-500 dark:text-gray-400 mb-8">
+        PlaneFYI is part of the <a href="https://transitfyi.com" class="underline" style="color:#0284C7">Transport FYI</a> family — aviation, rail, and flight data for developers.
+      </p>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-200 dark:border-gray-700">
+              <th class="text-left py-3 pr-6 font-semibold text-gray-700 dark:text-gray-300">Site</th>
+              <th class="text-left py-3 pr-6 font-semibold text-gray-700 dark:text-gray-300">Domain</th>
+              <th class="text-left py-3 pr-6 font-semibold text-gray-700 dark:text-gray-300">Focus</th>
+              <th class="text-left py-3 font-semibold text-gray-700 dark:text-gray-300">npm Package</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+            <tr>
+              <td class="py-3 pr-6 font-semibold" style="color: #D97706">AirportFYI</td>
+              <td class="py-3 pr-6"><a href="https://airportfyi.com" class="hover:underline text-gray-600 dark:text-gray-400">airportfyi.com</a></td>
+              <td class="py-3 pr-6 text-gray-600 dark:text-gray-400">4,500+ airports, IATA/ICAO codes, runways, routes</td>
+              <td class="py-3 font-mono text-xs text-gray-500">airportfyi-embed</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-6 font-semibold" style="color: #3B82F6">AirlineFYI</td>
+              <td class="py-3 pr-6"><a href="https://airlinefyi.com" class="hover:underline text-gray-600 dark:text-gray-400">airlinefyi.com</a></td>
+              <td class="py-3 pr-6 text-gray-600 dark:text-gray-400">Airlines, fleets, alliances, global routes</td>
+              <td class="py-3 font-mono text-xs text-gray-500">airlinefyi-embed</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-6 font-semibold" style="color: #0284C7">PlaneFYI</td>
+              <td class="py-3 pr-6"><a href="https://planefyi.com" class="hover:underline text-gray-600 dark:text-gray-400">planefyi.com</a></td>
+              <td class="py-3 pr-6 text-gray-600 dark:text-gray-400">Aircraft models, specs, manufacturers, seat maps</td>
+              <td class="py-3 font-mono text-xs text-gray-500">planefyi-embed</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-6 font-semibold" style="color: #EA580C">TrainFYI</td>
+              <td class="py-3 pr-6"><a href="https://trainfyi.com" class="hover:underline text-gray-600 dark:text-gray-400">trainfyi.com</a></td>
+              <td class="py-3 pr-6 text-gray-600 dark:text-gray-400">Railway stations, train routes, rail networks, amenities</td>
+              <td class="py-3 font-mono text-xs text-gray-500">trainfyi-embed</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- FYIPedia Ecosystem -->
+  <section id="ecosystem" class="py-16 border-b border-gray-200 dark:border-gray-800">
+    <div class="max-w-6xl mx-auto px-4">
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">FYIPedia Developer Ecosystem</h2>
+      <p class="text-gray-500 dark:text-gray-400 mb-8">
+        PlaneFYI Embed is part of <a href="https://fyipedia.com" class="underline" style="color:#0284C7">FYIPedia</a> — open-source data widgets across 6 domain families.
+      </p>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-200 dark:border-gray-700">
+              <th class="text-left py-3 pr-6 font-semibold text-gray-700 dark:text-gray-300">Family</th>
+              <th class="text-left py-3 pr-6 font-semibold text-gray-700 dark:text-gray-300">Sites</th>
+              <th class="text-left py-3 font-semibold text-gray-700 dark:text-gray-300">Focus</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+            <tr class="font-semibold" style="background: color-mix(in srgb, #0284C7 5%, transparent)">
+              <td class="py-3 pr-6" style="color:#0284C7">Transport FYI ★</td>
+              <td class="py-3 pr-6 text-gray-600 dark:text-gray-400">AirportFYI, AirlineFYI, PlaneFYI, TrainFYI</td>
+              <td class="py-3 text-gray-600 dark:text-gray-400">Aviation, airlines, aircraft, railways</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-6 font-semibold text-gray-700 dark:text-gray-300">Creative FYI</td>
+              <td class="py-3 pr-6 text-gray-600 dark:text-gray-400">ColorFYI, FontFYI, EmojiFYI, SymbolFYI, UnicodeFYI</td>
+              <td class="py-3 text-gray-600 dark:text-gray-400">Design tools, typography, characters</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-6 font-semibold text-gray-700 dark:text-gray-300">Geo FYI</td>
+              <td class="py-3 pr-6 text-gray-600 dark:text-gray-400">DistanceFYI, MountainFYI, QuakeFYI, ZipFYI</td>
+              <td class="py-3 text-gray-600 dark:text-gray-400">Distance, geography, seismic, postal</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-6 font-semibold text-gray-700 dark:text-gray-300">Health FYI</td>
+              <td class="py-3 pr-6 text-gray-600 dark:text-gray-400">AnatomyFYI, PillFYI, DrugFYI, NutriFYI</td>
+              <td class="py-3 text-gray-600 dark:text-gray-400">Anatomy, medications, nutrition</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-6 font-semibold text-gray-700 dark:text-gray-300">Network FYI</td>
+              <td class="py-3 pr-6 text-gray-600 dark:text-gray-400">CableFYI, IPFYI, StatusCodeFYI</td>
+              <td class="py-3 text-gray-600 dark:text-gray-400">Internet infrastructure, IP, protocols</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-6 font-semibold text-gray-700 dark:text-gray-300">Nature FYI</td>
+              <td class="py-3 pr-6 text-gray-600 dark:text-gray-400">SpeciesFYI, BirdFYI, FishFYI, PlantFYI, DinoFYI</td>
+              <td class="py-3 text-gray-600 dark:text-gray-400">Wildlife, species, paleontology</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-12 bg-gray-50 dark:bg-gray-900">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="grid md:grid-cols-3 gap-8 mb-8">
+        <div>
+          <div class="flex items-center gap-2 mb-3">
+            <svg class="w-5 h-5" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="32" height="32" rx="6" fill="#0284C7"/>
+              <path d="M6 20L14 12L12 8L16 9L18 12L24 10L25 12L20 15L22 22L19 22L16 17L13 19L13 22L10 22L10 18L6 20Z" fill="white"/>
+            </svg>
+            <span class="font-bold" style="color: #0284C7">PlaneFYI Embed</span>
+          </div>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">Transport data widgets for aviation, airlines, aircraft, and railways. Free, zero-dependencies, Shadow DOM isolated.</p>
+          <div class="flex gap-3">
+            <a href="https://github.com/fyipedia/planefyi-embed" class="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">GitHub →</a>
+            <a href="https://www.npmjs.com/package/planefyi-embed" class="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">npm →</a>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-semibold text-gray-700 dark:text-gray-300 text-sm mb-3">Transport FYI</h4>
+          <ul class="space-y-1.5">
+            <li><a href="https://airportfyi.com" class="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">AirportFYI →</a></li>
+            <li><a href="https://airlinefyi.com" class="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">AirlineFYI →</a></li>
+            <li><a href="https://planefyi.com" class="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">PlaneFYI →</a></li>
+            <li><a href="https://trainfyi.com" class="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">TrainFYI →</a></li>
+            <li><a href="https://transitfyi.com" class="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">TransitFYI Hub →</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-semibold text-gray-700 dark:text-gray-300 text-sm mb-3">Resources</h4>
+          <ul class="space-y-1.5">
+            <li><a href="https://planefyi.com/api/v1/" class="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">REST API →</a></li>
+            <li><a href="https://planefyi.com/api/openapi.json" class="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">OpenAPI Spec →</a></li>
+            <li><a href="https://github.com/fyipedia/planefyi-embed" class="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Source Code →</a></li>
+            <li><a href="https://fyipedia.com" class="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">FYIPedia Ecosystem →</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pt-6 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p class="text-xs text-gray-400">
+          © 2026 <a href="https://planefyi.com" class="hover:underline" style="color:#0284C7">planefyi.com</a> ·
+          Released under the <a href="https://opensource.org/licenses/MIT" class="hover:underline">MIT License</a>
+        </p>
+        <button onclick="toggleDark()" class="flex items-center gap-2 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+          <svg class="w-3.5 h-3.5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+          <svg class="w-3.5 h-3.5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+          </svg>
+          Toggle dark mode
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function toggleDark() {
+      const html = document.documentElement;
+      html.classList.toggle('dark');
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+    }
+
+    function copyCode(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      navigator.clipboard.writeText(el.textContent.trim()).then(function() {
+        const btn = document.querySelector('[onclick="copyCode(\'' + id + '\')"]');
+        if (btn) {
+          const orig = btn.textContent;
+          btn.textContent = 'Copied!';
+          btn.style.color = '#86efac';
+          setTimeout(function() {
+            btn.textContent = orig;
+            btn.style.color = '';
+          }, 2000);
+        }
+      });
+    }
+  </script>
+
 </body>
 </html>
