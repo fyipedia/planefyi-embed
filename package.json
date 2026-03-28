@@ -1,0 +1,43 @@
+{
+  "name": "planefyi-embed",
+  "version": "1.0.0",
+  "description": "Embed PlaneFYI widgets — aircraft cards, spec comparison tool, aviation terms. 81 aircraft types. Zero dependencies, Shadow DOM, 4 themes.",
+  "main": "dist/embed.min.js",
+  "module": "dist/embed.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "aircraft",
+    "airplane",
+    "aviation",
+    "specs",
+    "manufacturer",
+    "fleet",
+    "plane",
+    "embed",
+    "widget",
+    "planefyi",
+    "planefyi.com",
+    "shadow-dom",
+    "zero-dependencies",
+    "fyipedia",
+    "transportfyi"
+  ],
+  "homepage": "https://widget.planefyi.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fyipedia/planefyi-embed"
+  },
+  "bugs": {
+    "url": "https://github.com/fyipedia/planefyi-embed/issues"
+  },
+  "license": "MIT",
+  "author": "FYIPedia <dev@fyipedia.com>",
+  "publishConfig": {
+    "access": "public"
+  }
+}
