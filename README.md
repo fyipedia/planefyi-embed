@@ -185,6 +185,17 @@ Part of [FYIPedia](https://fyipedia.com) — open-source developer tools ecosyst
 | namefyi | [PyPI](https://pypi.org/project/namefyi/) | [npm](https://www.npmjs.com/package/namefyi) | Korean romanization & Five Elements — [namefyi.com](https://namefyi.com) |
 | fyipedia | [PyPI](https://pypi.org/project/fyipedia/) | — | Unified CLI for all FYI tools — [fyipedia.com](https://fyipedia.com) |
 
+## Embed Widget
+
+Embed [PlaneFYI](https://planefyi.com) widgets on any website with [planefyi-embed](https://widget.planefyi.com):
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/planefyi-embed@1/dist/embed.min.js"></script>
+<div data-planefyi="entity" data-slug="example"></div>
+```
+
+Zero dependencies · Shadow DOM · 4 themes (light/dark/sepia/auto) · [Widget docs](https://widget.planefyi.com)
+
 ## License
 
 MIT — see [LICENSE](./LICENSE).
