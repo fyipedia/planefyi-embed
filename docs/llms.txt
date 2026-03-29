@@ -1,21 +1,48 @@
 # PlaneFYI Embed Widget
 
-> Embeddable PlaneFYI widgets for any website. Zero dependencies, Shadow DOM isolation, 4 themes (light/dark/sepia/auto).
+> Aircraft models, specifications. Embeddable widgets for any website. Zero dependencies, Shadow DOM isolation.
 
 ## Quick Start
 
-Add to any HTML page:
-- Script: <script src="https://cdn.jsdelivr.net/npm/planefyi-embed@1/dist/embed.min.js"></script>
+```html
+<script src="https://cdn.jsdelivr.net/npm/planefyi-embed@1/dist/embed.min.js"></script>
+<div data-planefyi="spec-compare" data-slug="example"></div>
+```
+
+## Available Widget Types (4)
+
+- entity: `data-planefyi="entity"`
+- glossary: `data-planefyi="glossary"`
+- search: `data-planefyi="search"`
+- spec-compare (interactive): `data-planefyi="spec-compare"`
+
+## Customization
+
+- **Themes**: light, dark, sepia, auto (follows system preference)
+- **Sizes**: compact (280px), default (420px), large (720px)
+- **Styles**: modern, classic
+
+```html
+<div data-planefyi="spec-compare" data-slug="example"
+     data-theme="auto" data-size="compact" data-style-variant="modern"></div>
+```
+
+## Integration Methods
+
+1. **Script tag** (recommended): `<script src="https://cdn.jsdelivr.net/npm/planefyi-embed@1/dist/embed.min.js"></script>`
+2. **iframe**: `https://planefyi.com/iframe/entity/{slug}/`
+3. **oEmbed**: `https://planefyi.com/oembed?url={page_url}&format=json`
+4. **Badge**: `https://planefyi.com/badge/site.svg`
 
 ## Links
 
 - Main site: https://planefyi.com
 - Widget docs: https://widget.planefyi.com
-- npm: https://www.npmjs.com/package/planefyi-embed
+- API documentation: https://planefyi.com/developers/
+- npm package: https://www.npmjs.com/package/planefyi-embed
 - GitHub: https://github.com/fyipedia/planefyi-embed
-- API: https://planefyi.com/developers/
 
-## Transport FYI Widget Family
+## Transport FYI Widget Network
 
 - [AirportFYI Widget](https://widget.airportfyi.com)
 - [AirlineFYI Widget](https://widget.airlinefyi.com)
