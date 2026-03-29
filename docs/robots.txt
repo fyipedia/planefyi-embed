@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# PlaneFYI Embed Widget
+# Main site: https://planefyi.com
+# Widget docs: https://widget.planefyi.com
+# npm: https://www.npmjs.com/package/planefyi-embed
