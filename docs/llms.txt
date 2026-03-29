@@ -1,0 +1,26 @@
+# PlaneFYI Embed Widget
+
+> Embeddable PlaneFYI widgets for any website. Zero dependencies, Shadow DOM isolation, 4 themes (light/dark/sepia/auto).
+
+## Quick Start
+
+Add to any HTML page:
+- Script: <script src="https://cdn.jsdelivr.net/npm/planefyi-embed@1/dist/embed.min.js"></script>
+
+## Links
+
+- Main site: https://planefyi.com
+- Widget docs: https://widget.planefyi.com
+- npm: https://www.npmjs.com/package/planefyi-embed
+- GitHub: https://github.com/fyipedia/planefyi-embed
+- API: https://planefyi.com/developers/
+
+## Transport FYI Widget Family
+
+- [AirportFYI Widget](https://widget.airportfyi.com)
+- [AirlineFYI Widget](https://widget.airlinefyi.com)
+- [TrainFYI Widget](https://widget.trainfyi.com)
+
+## Part of FYIPedia
+
+Open-source developer tools ecosystem — https://fyipedia.com
